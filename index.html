@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETSY — Legendary Software Marketplace</title>
+  <meta name="description" content="ETSY — the premium marketplace for professional-grade creative, engineering, productivity, developer, and VPN software. Instant delivery, secure checkout, flexible payment." />
+
+  <link rel="icon" type="image/png" href="assets/brand-logo-display.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- PAGE LOADER -->
+  <div id="boot-loader" role="status" aria-label="Loading ETSY">
+    <div class="volt-loader" aria-hidden="true">
+      <span class="volt-loader-orbit"></span>
+      <span class="volt-loader-core">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M13.2 2.5 5.8 13h5.3l-.5 8.5L18.2 11h-5.3l.3-8.5Z" />
+        </svg>
+      </span>
+    </div>
+  </div>
+
+  <!-- BACKGROUNDS -->
+  <canvas id="grid-canvas" aria-hidden="true"></canvas>
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <!-- NAVIGATION -->
+  <nav id="navbar" aria-label="Primary">
+    <div class="nav-brand-group">
+      <a href="#/" class="brand" aria-label="ETSY home">
+        <img class="brand-mark" src="assets/brand-logo-display.png" width="44" height="44" alt="ETSY logo" />
+        <span class="brand-name">ETSY</span>
+      </a>
+      <div class="hbs">
+        <div class="hbs-switch" id="theme-switch">
+          <input class="hbs-input" type="checkbox" role="switch" aria-label="Dark mode" checked>
+          <div class="hbs-plate"></div>
+          <div class="hbs-groove">
+            <div class="hbs-ridge"></div>
+            <div class="hbs-shadow"></div>
+          </div>
+          <div class="hbs-ball">
+            <div class="hbs-face">
+              <div class="hbs-steel"></div>
+              <div class="hbs-steel-day"></div>
+              <div class="hbs-ring"></div>
+            </div>
+            <div class="hbs-shine"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="#/products">Software</a></li>
+      <li><a href="#/about">About</a></li>
+      <li><a href="#/faq">FAQ</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="icon-btn" id="account-btn" title="Account" aria-label="Account">👤</button>
+      <button class="btn-primary" onclick="ETSY.openWhatsApp()">Contact Us</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main id="app" role="main">
+
+    <!-- HOME -->
+    <div class="view view-home" data-view="home">
+      <section class="hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-eyebrow">
+          <span class="dot"></span> LEGENDARY SOFTWARE MARKETPLACE
+        </div>
+        <h1 class="hero-title" aria-label="Premium software for ambitious creators.">
+          <span class="typing-line" data-typing-text="Premium software" aria-hidden="true">Premium software</span>
+          <span class="grad typing-line" data-typing-text="for ambitious creators." aria-hidden="true">for ambitious creators.</span>
+        </h1>
+        <p class="hero-sub">
+          ETSY curates professional-grade software for design, engineering,
+          productivity, development, and online privacy — with flexible payment built for you.
+        </p>
+        <div class="hero-cta">
+          <a href="#/products" class="btn-primary btn-lg">Explore software</a>
+          <button class="btn-ghost btn-lg" onclick="ETSY.openWhatsApp()">Talk to sales</button>
+        </div>
+      </section>
+
+      <div class="trust-bar">
+        <div>⚡ Instant delivery</div>
+        <div>🔒 Secure checkout</div>
+        <div>🔄 Lifetime updates</div>
+        <div>💬 24/7 priority support</div>
+      </div>
+
+      <section class="section" id="featured">
+        <div class="section-head">
+          <span class="kicker">Featured collection</span>
+          <h2>Legendary tools</h2>
+          <p>Hand-picked, professional-grade software trusted by top creators worldwide.</p>
+        </div>
+        <div class="product-grid" id="featured-grid"></div>
+      </section>
+
+      <section class="section section-tight">
+        <div class="stats-wrapper">
+          <div class="stat"><h3 data-count-to="12" data-count-decimals="0" data-count-suffix="K+">12K+</h3><p>Happy customers</p></div>
+          <div class="stat"><h3 data-count-to="99.9" data-count-decimals="1" data-count-suffix="%">99.9%</h3><p>Uptime delivery</p></div>
+          <div class="stat"><h3 data-count-to="24" data-count-decimals="0" data-count-suffix="/7">24/7</h3><p>Expert support</p></div>
+          <div class="stat"><h3 data-count-to="4.9" data-count-decimals="1" data-count-suffix="★">4.9★</h3><p>Average rating</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="section-head">
+          <span class="kicker">Support</span>
+          <h2>Frequently asked questions</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq">
+            <summary>How do I receive my software after purchase?</summary>
+            <p>Once your payment is confirmed, we send your download link and license key directly to your email or WhatsApp within minutes.</p>
+          </details>
+          <details class="faq">
+            <summary>What payment methods do you accept?</summary>
+            <p>PayPal, Bank Transfer (RIB), Cash on Delivery, Cash Plus, Wafacash and Barid Cash.</p>
+          </details>
+          <details class="faq">
+            <summary>Is the software lifetime or subscription?</summary>
+            <p>Depends on the product. We offer both lifetime licenses and annual subscriptions — click "Request access" on any product to talk to our team.</p>
+          </details>
+        </div>
+      </section>
+    </div>
+
+    <!-- PRODUCTS LIST -->
+    <div class="view view-products" data-view="products" hidden>
+      <section class="section">
+        <div class="section-head section-head-left">
+          <span class="kicker">All software</span>
+          <h2>Browse the catalog</h2>
+          <p>Filter by category, sort by popularity, and open any product for full details.</p>
+        </div>
+        <div class="toolbar">
+          <input type="search" id="search-input" class="search-input" placeholder="Search software…" autocomplete="off" />
+          <div class="filters" id="category-filters"></div>
+        </div>
+        <div class="product-grid" id="products-grid"></div>
+      </section>
+    </div>
+
+    <!-- PRODUCT DETAIL -->
+    <div class="view view-product" data-view="product" hidden>
+      <section class="section product-detail">
+        <div class="product-hero" id="product-hero"></div>
+        <div class="product-tabs" id="product-tabs"></div>
+        <div class="product-content" id="product-content"></div>
+        <div class="product-related" id="product-related"></div>
+      </section>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="view view-about" data-view="about" hidden>
+      <section class="section">
+        <div class="section-head">
+          <span class="kicker">About ETSY</span>
+          <h2>The premium marketplace for serious software.</h2>
+          <p>ETSY exists to make professional software accessible — without the bloat, the fake stores, or the piracy. Every product is verified, every license is legitimate, and every customer gets a real human on the other end of WhatsApp.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- EMAIL VERIFICATION -->
+    <div class="view view-verify" data-view="verify" hidden>
+      <section class="section verify-section">
+        <div class="verify-card" id="verify-card">
+          <div class="verify-icon" id="verify-icon">
+            <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+              <defs>
+                <linearGradient id="v-grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#a855f7"/>
+                  <stop offset="1" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+              <rect width="64" height="64" rx="16" fill="none" stroke="url(#v-grad)" stroke-width="2"/>
+              <path d="M18 22l14 10 14-10M18 22v20h28V22H18z" fill="none" stroke="url(#v-grad)" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h1 class="verify-title" id="verify-title">Check your email</h1>
+          <p class="verify-desc" id="verify-desc">
+            We sent a verification link to <strong id="verify-email">your inbox</strong>.
+            Click the link in the email to activate your ETSY account.
+          </p>
+          <div class="verify-status" id="verify-status" hidden>
+            <span class="verify-spinner"></span>
+            <span id="verify-status-text">Verifying…</span>
+          </div>
+          <div class="verify-actions" id="verify-actions">
+            <button class="btn-primary btn-lg" id="verify-resend">Resend email</button>
+            <button class="btn-ghost btn-lg" id="verify-check">I've verified — continue</button>
+          </div>
+          <p class="verify-note" id="verify-note">
+            Didn't receive the email? Check your spam folder, or wait 60 seconds before resending.
+          </p>
+          <div class="verify-otp" id="verify-otp" hidden>
+            <div class="verify-otp-label">Enter the 6-digit code</div>
+            <div class="verify-otp-inputs" id="verify-otp-inputs">
+              <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+            </div>
+            <button class="btn-primary btn-lg" id="verify-otp-submit" style="width:100%;margin-top:16px">
+              Verify code
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 404 -->
+    <div class="view view-404" data-view="404" hidden>
+      <section class="section section-404">
+        <h1 class="grad-404">404</h1>
+        <p>That page doesn't exist. Let's get you back to the good stuff.</p>
+        <a href="#/" class="btn-primary btn-lg">Back to home</a>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#/" class="brand">
+          <img class="brand-mark" src="assets/brand-logo-display.png" width="36" height="36" alt="ETSY logo" />
+          <span class="brand-name">ETSY</span>
+        </a>
+        <p>The legendary marketplace for professional-grade software. Built for creators, trusted by professionals.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Shop</h5>
+        <a href="#/products">Design &amp; Creative</a>
+        <a href="#/products">Video Editing</a>
+        <a href="#/products">Engineering</a>
+        <a href="#/products">Productivity</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#/faq">FAQ</a>
+        <a href="#" onclick="ETSY.openWhatsApp(); return false;">Contact us</a>
+        <a href="#/terms">Terms of service</a>
+        <a href="#/privacy">Privacy policy</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#/about">About ETSY</a>
+        <a href="#/reviews">Reviews</a>
+        <a href="#/careers">Careers</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 ETSY. All rights reserved.</div>
+      <div>Designed with precision.</div>
+    </div>
+  </footer>
+
+  <!-- WHATSAPP -->
+  <button class="wa-float" type="button" aria-label="Chat on WhatsApp"
+          onclick="ETSY.openWhatsApp('Hello ETSY! I am interested in your software.')">💬</button>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal-backdrop" id="checkout-modal" hidden>
+    <div class="glass-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+      <button class="modal-close" type="button" onclick="ETSY.closeCheckout()" aria-label="Close">✕</button>
+      <h3 id="checkout-title">Request access</h3>
+      <p class="modal-sub" id="checkout-product">Adobe Photoshop</p>
+      <div class="pay-label">Select payment method</div>
+      <div class="pay-options" id="pay-options"></div>
+      <button class="btn-primary modal-confirm" type="button" onclick="ETSY.confirmOrder()">
+        Contact via WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- ACCOUNT MODAL -->
+  <div class="modal-backdrop" id="account-modal" hidden>
+    <div class="glass-modal account-modal" role="dialog" aria-modal="true" aria-labelledby="account-title">
+      <button class="modal-close" type="button" onclick="ETSY.closeAccount()" aria-label="Close">✕</button>
+      <canvas class="volt-login-sky" aria-hidden="true"></canvas>
+      <div class="account-modal-main">
+        <button class="volt-sound-toggle" type="button" aria-label="Mute login sounds" aria-pressed="true" title="Mute login sounds">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 10v4h4l5 4V6l-5 4H4Z" />
+            <path class="volt-sound-wave" d="M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
+            <path class="volt-sound-muted" d="m16 9 5 6m0-6-5 6" />
+          </svg>
+        </button>
+        <div class="volt-account-mark" aria-hidden="true">
+          <span class="volt-account-orbit"></span>
+          <svg viewBox="0 0 24 24"><path d="M13.2 2.5 5.8 13h5.3l-.5 8.5L18.2 11h-5.3l.3-8.5Z" /></svg>
+        </div>
+        <a href="#/" class="account-brand" aria-label="ETSY home">
+          <img class="account-brand-mark" src="assets/brand-logo-display.png" width="38" height="38" alt="ETSY logo" />
+          <span class="brand-name">ETSY</span>
+        </a>
+        <p class="account-kicker">MEMBER ACCESS</p>
+        <h3 id="account-title">Account</h3>
+        <p class="modal-sub">Sign in to track your purchases and downloads.</p>
+        <div id="account-content">
+          <p class="account-hint">Connecting…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

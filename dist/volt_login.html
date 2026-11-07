@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  Volt Login by @codinvisual · t.me/CodinVisual
+
+  HOW TO USE
+  Try it: double-click this file. A ball of lightning sits over the email field and crackles in place.
+    Click a field or start typing and it follows you, strikes each key, shorts on a wrong password
+    (light sags and comes back, orange sparks drift down), and charges Sign in when the password is right.
+    Demo password: thunder. For the full auto-run walkthrough, add play(); as the last line of the script.
+  Put it on your site:
+  1. Copy everything in <style> except `body { ... }` into your CSS.
+  2. Copy the <div class="night">, the <canvas class="sky"> and the <form class="login"> blocks into your page.
+     Don't want the dark? Skip .night, the lightning still works.
+  3. Copy the <script> block right before </body>. Do not add play(); unless you want the scripted demo on load.
+  Make it check real passwords:
+    Don't just put your own password in place of DEMO_PASSWORD, anyone can read it in the page source.
+  4. Find `a real request goes here` in signIn(), delete the demo check and use the fetch() example
+     with your own login address. Return true when the login is right, false shorts it out.
+  Worth changing:
+    STIFF = 0.08   how hard the ball pulls toward its goal, higher is faster
+    DAMP = 0.7     how quickly it settles, closer to 1 is jumpier
+    ARCS = 4       how many little arcs crackle round the ball
+    bolt(a, b, r)  r is how wild a strike is, the bolt splits until the pieces are under 2px
+    SAG            how the light sags and comes back after a wrong password, one number per 0.15 s, blended in between
+    #E6FF4F is the electric light, #FF9A7A the orange of a short, 260px in .night is the size of the lit circle.
+  With reduced motion turned on the arcs and strikes stay still, the light doesn't sag or breathe and no sparks fall.
+
+  КАК ПОЛЬЗОВАТЬСЯ
+  Попробовать: откройте файл двойным кликом. Шаровая молния уже трещит над полем почты.
+    Кликните по полю или начните печатать: она летит за вами, бьёт в каждую букву, на неверном пароле
+    коротит (свет проседает и возвращается, оседают оранжевые искры), на верном заряжает кнопку входа.
+    Пароль в демо: thunder. Полный автодемо-прогон: последняя строка скрипта play();
+  Поставить на свой сайт:
+  1. Скопируйте всё внутри <style>, кроме `body { ... }`, в свои стили.
+  2. Блоки <div class="night">, <canvas class="sky"> и <form class="login"> вставьте на свою страницу.
+     Не нужна темнота? Не берите .night, молния работает и без неё.
+  3. Блок <script> вставьте прямо перед </body>. play(); не добавляйте, если не нужен автопрогон при загрузке.
+  Чтобы проверялись настоящие пароли:
+    Не вписывайте свой пароль вместо DEMO_PASSWORD, его прочитает любой через код страницы.
+  4. Найдите `a real request goes here` в signIn(), удалите демо-проверку и используйте пример
+     с fetch(), указав адрес вашего входа. Верните true, если вход верный, на false будет короткое замыкание.
+  Что можно поменять:
+    STIFF = 0.08   как сильно молнию тянет к цели, больше значит быстрее
+    DAMP = 0.7     как быстро она успокаивается, ближе к 1 значит резче скачет
+    ARCS = 4       сколько маленьких дуг трещит вокруг шара
+    bolt(a, b, r)  r это насколько рваный разряд, молния делится, пока куски не станут меньше 2px
+    SAG            как проседает и возвращается свет после неверного пароля, одно число на каждые 0.15 с, между ними плавно
+    #E6FF4F это цвет разряда, #FF9A7A оранжевый цвет замыкания, 260px в .night это размер светлого круга.
+  С включённым уменьшением движения дуги и разряды не дёргаются, свет не проседает и не дышит, искры не сыплются.
+
+  Everything is in this one file: styles in <style>, markup in <body>, logic in <script>.
+  No libraries, no build step, works offline.
+
+  Built by @codinvisual · 05.11.2026 · t.me/CodinVisual
+  Use it free on your own site, personal or commercial. Don't repost or resell this file itself.
+-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Volt Login</title>
+<style>body{color:#f2f4ec;-webkit-font-smoothing:antialiased;background:radial-gradient(720px at 50% 45%,#e6ff4f0a,#0000 70%),#07080a;place-items:center;min-height:100vh;margin:0;font-family:system-ui,sans-serif;display:grid;overflow:hidden}.night{z-index:5;pointer-events:none;background:radial-gradient(circle at var(--x,-200px) var(--y,30%), #e6ff4f12 0, #07080a38 calc(var(--r,260px) * .5), #07080a85 var(--r,260px));transition:opacity .6s;position:fixed;inset:0}.night.day{opacity:.3}.sky{z-index:6;pointer-events:none;mix-blend-mode:screen;width:100%;height:100%;position:fixed;inset:0}.login{box-sizing:border-box;gap:16px;width:min(360px,92vw);margin:0;display:grid;position:relative}.field{background:#121410;border-radius:14px;height:52px;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1.2px #ebffc81a}.field:focus-within,.field.lit{box-shadow:inset 0 0 0 1.6px #e6ff4fe6,0 0 0 4px #e6ff4f24}.field input{box-sizing:border-box;color:#f2f4ec;caret-color:#e6ff4f;background:0 0;border:0;outline:0;width:100%;height:100%;padding:0 52px 0 18px;font:500 16px system-ui,sans-serif;position:relative}.field input::placeholder{color:#cdd2be73}.pass input{color:#0000;caret-color:#0000}.mirror{pointer-events:none;font:500 16px system-ui,sans-serif;position:absolute;inset:0 52px 0 18px;overflow:hidden}.dots,.text{white-space:pre;align-items:center;transition:opacity .3s cubic-bezier(.77,0,.175,1),filter .3s cubic-bezier(.77,0,.175,1);display:flex;position:absolute;top:0;bottom:0;left:0}.dots i{flex:none;place-items:center;width:14px;height:14px;display:grid}.dots i:after{content:"";background:#f2f4ec;border-radius:50%;width:7px;height:7px}.text{opacity:0;filter:blur(3px);letter-spacing:.5px}.text b{font-weight:500}.show .dots{opacity:0;filter:blur(3px)}.show .text{opacity:1;filter:none}.dots i.new,.text b.new{animation:.4s cubic-bezier(.23,1,.32,1) zap}@keyframes zap{0%{filter:drop-shadow(0 0 6px #e6ff4f)brightness(2)}}.pass.burn .dots i:after,.pass.burn .text b{animation:burn .45s cubic-bezier(.45, 0, .55, 1) calc(var(--i,0) * 40ms) forwards}@keyframes burn{30%{color:#ff9a7a;background:#ff9a7a;box-shadow:0 0 8px #ff9a7a}to{color:#ff9a7a;opacity:0;background:#ff9a7a;scale:.5;box-shadow:0 0 8px #ff9a7a00}}.pass.burn input::placeholder{color:#0000}.caret{opacity:0;background:#e6ff4f;width:2px;height:20px;position:absolute;top:16px;left:0}.pass:focus-within .caret{opacity:1;animation:1s step-end infinite blink}@keyframes blink{50%{opacity:0}}.eye{cursor:pointer;color:#e4e8d78c;background:0 0;border:0;border-radius:10px;place-items:center;width:36px;height:36px;padding:0;transition:color .2s,transform .16s ease-out;display:grid;position:absolute;top:8px;right:8px}.eye:active{transform:scale(.94)}.eye:focus-visible{outline-offset:1px;outline:2px solid #e6ff4f}.eye svg{fill:none;stroke:currentColor;stroke-width:1.7px;stroke-linecap:round;stroke-linejoin:round;width:22px;height:22px}.eye .slash{stroke-dasharray:26;stroke-dashoffset:0;transition:stroke-dashoffset .25s cubic-bezier(.23,1,.32,1)}.show .eye{color:#e6ff4f}.show .eye .slash{stroke-dashoffset:26px}.note{color:#ff9a7a;opacity:0;pointer-events:none;margin:0;font:600 13px system-ui,sans-serif;transition:opacity .2s ease-out,transform .2s ease-out;position:absolute;top:128px;left:4px;transform:translateY(-4px)}.note.on{opacity:1;transform:none}.send{color:#edf0e4;cursor:pointer;background:#171a13;border:0;border-radius:27px;height:54px;margin-top:10px;font:600 16px system-ui,sans-serif;transition:transform .16s ease-out;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1.2px #f0ffd21a}.send:active{transform:scale(.97)}.send:focus-visible{outline-offset:3px;outline:2px solid #e6ff4f}.send:before{content:"";clip-path:circle(0 at var(--hx,50%) 50%);background:linear-gradient(#f6ffb8,#d3f53a);transition:clip-path .5s cubic-bezier(.23,1,.32,1);position:absolute;inset:0}.send.done:before{clip-path:circle(150% at var(--hx,50%) 50%)}.send.still:before,.send.still span{transition:none}.send span{justify-content:center;align-items:center;gap:8px;transition:opacity .3s ease-out,filter .3s ease-out,transform .3s cubic-bezier(.23,1,.32,1);display:flex;position:absolute;inset:0}.send .ok{color:#1d2500;opacity:0;filter:blur(3px);transform:translateY(6px)}.send .ok svg{fill:none;stroke:currentColor;stroke-width:2.4px;stroke-linecap:round;stroke-linejoin:round;width:18px;height:18px}.send.done .go{opacity:0;filter:blur(3px);transform:translateY(-6px)}.send.done .ok{opacity:1;filter:none;transition-delay:.16s;transform:none}@media (hover:hover) and (pointer:fine){.send:not(.done):hover{background:#1d2118}}</style>
+</head>
+<body>
+
+<div class="night" aria-hidden="true"></div>
+<canvas class="sky" aria-hidden="true"></canvas>
+
+<form class="login" novalidate>
+  <div class="field mail">
+    <input id="email" type="email" name="email" placeholder="Email" autocomplete="username" aria-label="Email">
+  </div>
+  <div class="field pass">
+    <input id="pass" type="password" name="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+    <span class="mirror" aria-hidden="true"><span class="dots"></span><span class="text"></span><i class="caret"></i></span>
+    <button class="eye" type="button" aria-label="Show password" aria-pressed="false">
+      <svg viewBox="0 0 24 24"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3.2"/><path class="slash" d="M3.5 20.5 20.5 3.5"/></svg>
+    </button>
+  </div>
+  <p class="note" aria-live="polite"></p>
+  <button class="send" type="submit">
+    <span class="go">Sign in</span>
+    <span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>You're in</span>
+  </button>
+</form>
+
+<script>
+  // Volt Login by @codinvisual · t.me/CodinVisual · free for your own site, don't resell this file
+  const STIFF = 0.08, DAMP = 0.7, ARCS = 4;
+  // after a wrong password the light sags by SAG, one number per 0.15 s, blended in between
+  const SAG = [1, .45, .12, 0, .3, .1, .65, 1];
+  const DEMO_PASSWORD = 'thunder';          // the demo's only right answer, delete it once your server checks
+
+  const $ = s => document.querySelector(s);
+  const form = $('.login'), email = $('#email'), pass = $('#pass'), eye = $('.eye'), send = $('.send'), note = $('.note');
+  const mailField = email.parentElement, passField = pass.parentElement;
+  const night = $('.night'), dots = $('.dots'), text = $('.text'), caret = $('.caret');
+  const sky = $('.sky'), g = sky.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const pen = document.createElement('canvas').getContext('2d');
+  pen.font = '500 16px system-ui, sans-serif';
+
+  // one strike of lightning: split the line in two at a jittered middle until the pieces are tiny
+  const WILD = reduce ? 0 : 1;              // with reduced motion every strike is a straight line
+  const shake = r => (Math.random() - .5) * r;
+  function bolt(a, b, r) {
+    if (r < 2) return g.lineTo(b.x, b.y);
+    const m = { x: (a.x + b.x) / 2 + shake(r),
+                y: (a.y + b.y) / 2 + shake(r) };
+    bolt(a, m, r / 2); bolt(m, b, r / 2);
+  }
+
+  // where the ball hovers for each element: just above a field, in the middle of a button
+  function at(el) {
+    const r = el.getBoundingClientRect();
+    if (el === email || el === pass) return { x: r.left + 30, y: r.top - 26 };
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  // the spot a key strikes: the last character of the field
+  function spot(input) {
+    const r = input.getBoundingClientRect(), v = input.value;
+    const w = input === email ? pen.measureText(v).width
+      : passField.classList.contains('show') ? pen.measureText(v).width + v.length * .5 : v.length * 14 - 7;
+    return { x: r.left + 18 + Math.min(Math.max(w, 6), r.width - 70), y: r.top + r.height / 2 };
+  }
+  const above = p => ({ x: p.x + 6, y: p.y - 52 });
+
+  // it starts just off the email field and flies in, so it crackles in the frame from the start
+  let goal = above(spot(email)), x = goal.x - 60, y = goal.y - 30, vx = 0, vy = 0;
+  let hit = null, shortAt = -1e4, charged = null, inside = false, vis = 1, away = false, dpr = 1;
+  let last = performance.now(), acc = 0;
+  const sparks = [];
+  function size() {
+    dpr = Math.min(2, devicePixelRatio || 1);
+    sky.width = innerWidth * dpr; sky.height = innerHeight * dpr;
+  }
+  addEventListener('resize', size); size();
+  const strike = p => { hit = { x: p.x, y: p.y, at: performance.now() }; };
+
+  // how much charge it has; a frame can start a little before the answer came, so s < 0 counts as full light
+  function light(now) {
+    const s = (now - shortAt) / 150, i = Math.floor(s);
+    if (reduce || s < 0 || i >= SAG.length - 1) return 1;
+    return SAG[i] + (SAG[i + 1] - SAG[i]) * (s - i);
+  }
+  // how orange it is: comes in over .15 s, holds while the light sags, goes over .3 s
+  const heat = now => { const s = (now - shortAt) / 1000; return s < 0 ? 0 : clamp(s / .15) * clamp((1.05 - s) / .3); };
+  const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k)).join();
+
+  (function fly(now = performance.now()) {
+    acc += Math.min(100, now - last); last = now;
+    for (; acc >= 1000 / 60; acc -= 1000 / 60) {
+      vx = (vx + (goal.x - x) * STIFF) * DAMP;
+      vy = (vy + (goal.y - y) * STIFF) * DAMP;
+      x += vx; y += vy;
+      vis += ((away ? 0 : 1) - vis) * .035;        // it fades out like ball lightning when it leaves
+      for (const p of sparks) { p.x += p.vx; p.y += p.vy; p.vx *= .95; p.vy = p.vy * .95 + .05; p.age += 1 / 60; }   // they slow down and settle
+    }
+    for (let i = sparks.length - 1; i >= 0; i--) if (sparks[i].age >= sparks[i].life) sparks.splice(i, 1);
+    const k = light(now);
+    night.style.setProperty('--x', x + 'px');
+    night.style.setProperty('--y', y + 'px');
+    night.style.setProperty('--r', (260 * (.4 + .6 * k) * (.35 + .65 * vis)).toFixed(1) + 'px');
+    draw(now, k);
+    requestAnimationFrame(fly);
+  })();
+
+  function stroke(width, color) { g.lineWidth = width; g.strokeStyle = color; g.stroke(); }
+  function draw(now, k) {
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, innerWidth, innerHeight);
+    g.globalCompositeOperation = 'lighter';
+    g.lineCap = g.lineJoin = 'round';
+    const here = { x, y }, h = heat(now), pulse = reduce ? 1 : .86 + .14 * Math.sin(now / 1000 * 5.2), arc = mix([240, 255, 170], [255, 190, 150], h);
+    if (k > .1 && !inside && vis > .1) {
+      for (let i = 0; i < ARCS; i++) {               // the little arcs that crackle round the ball
+        const a = reduce ? i * 1.57 : Math.random() * 7, len = 12 + (reduce ? 6 : Math.random() * 12);
+        g.beginPath(); g.moveTo(x, y); bolt(here, { x: x + Math.cos(a) * len, y: y + Math.sin(a) * len }, 10 * WILD);
+        stroke(1.2, `rgba(${arc},${(.7 * k * vis).toFixed(3)})`);
+      }
+    }
+    const age = hit ? (now - hit.at) / 1000 : 9;
+    if (age < .12 && k > .1) {                        // a strike: a wide glow, then the white-hot core
+      const path = () => { g.beginPath(); g.moveTo(x, y); bolt(here, hit, 26 * WILD); };
+      path(); stroke(6, 'rgba(230,255,79,.22)');
+      path(); stroke(1.6, 'rgba(250,255,225,.95)');
+      const f = g.createRadialGradient(hit.x, hit.y, 0, hit.x, hit.y, 22);
+      f.addColorStop(0, `rgba(240,255,160,${(.6 * (1 - age / .12)).toFixed(3)})`); f.addColorStop(1, 'rgba(230,255,79,0)');
+      g.fillStyle = f; g.fillRect(hit.x - 22, hit.y - 22, 44, 44);
+    }
+    const ss = (now - shortAt) / 1000;
+    if (ss >= 0 && ss < .4) {                         // the short: orange arcs crackle over the button for a moment
+      const r = send.getBoundingClientRect();
+      for (let i = 0; i < 3; i++) {
+        const ax = r.left + 20 + Math.random() * (r.width - 40), bx = ax + (Math.random() - .5) * 90;
+        g.beginPath(); g.moveTo(ax, r.top + 8); bolt({ x: ax, y: r.top + 8 }, { x: bx, y: r.bottom - 8 }, 18 * WILD);
+        stroke(1.4, `rgba(255,170,130,${(.9 * (1 - ss / .4)).toFixed(3)})`);
+      }
+    }
+    if (charged !== null) {                           // after sign in, arcs crawl over the button for a moment
+      const s = (now - charged) / 1000, r = send.getBoundingClientRect();
+      if (s < .9) for (let i = 0; i < 3; i++) {
+        const ax = r.left + 20 + Math.random() * (r.width - 40), bx = ax + (Math.random() - .5) * 90;
+        g.beginPath(); g.moveTo(ax, r.top + 8); bolt({ x: ax, y: r.top + 8 }, { x: bx, y: r.bottom - 8 }, 18 * WILD);
+        stroke(1.4, `rgba(255,255,230,${(.9 * (1 - s / .9)).toFixed(3)})`);
+      }
+    }
+    for (const p of sparks) {                         // sparks twinkle and settle
+      const al = (1 - p.age / p.life) * (reduce ? 1 : .6 + .4 * Math.sin(p.age * 14 + p.r * 9)), c = p.hot ? '255,190,150' : '240,255,170';
+      const d = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3.5);
+      d.addColorStop(0, `rgba(${c},${al.toFixed(3)})`); d.addColorStop(1, `rgba(${c},0)`);
+      g.fillStyle = d; g.fillRect(p.x - p.r * 3.5, p.y - p.r * 3.5, p.r * 7, p.r * 7);
+    }
+    if (inside) {                                     // inside the button it still shows, a dim core and its light through the surface
+      const r = send.getBoundingClientRect();
+      g.save(); g.beginPath(); g.roundRect(r.left, r.top, r.width, r.height, r.height / 2); g.clip();
+      const u = g.createRadialGradient(x, y, 0, x, y, 60);
+      u.addColorStop(0, `rgba(240,255,170,${(.45 * k).toFixed(3)})`); u.addColorStop(1, 'rgba(230,255,79,0)');
+      g.fillStyle = u; g.fillRect(x - 60, y - 60, 120, 120); g.restore();
+      g.fillStyle = `rgba(255,255,245,${(.35 * k).toFixed(3)})`; g.beginPath(); g.arc(x, y, 4, 0, 7); g.fill();
+    } else if (vis > .01) {                           // the ball itself, breathing; orange while it is shorted
+      const lv = k * pulse * vis;
+      for (const [on, c] of [[1 - h, ['245,255,190', '230,255,79']], [h, ['255,215,190', '255,154,122']]]) {
+        if (on <= 0) continue;
+        const glow = g.createRadialGradient(x, y, 0, x, y, 46);
+        glow.addColorStop(0, `rgba(${c[0]},${(.9 * lv * on).toFixed(3)})`); glow.addColorStop(.25, `rgba(${c[1]},${(.35 * lv * on).toFixed(3)})`); glow.addColorStop(1, `rgba(${c[1]},0)`);
+        g.fillStyle = glow; g.fillRect(x - 46, y - 46, 92, 92);
+      }
+      g.fillStyle = `rgba(255,255,245,${((.35 + .65 * k) * vis).toFixed(3)})`; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill();
+    }
+  }
+
+  const follow = el => () => goal = el === email || el === pass ? above(spot(el)) : at(el);
+  for (const el of [email, pass, eye, send])
+    el.onfocus = el.onclick = follow(el);
+
+  email.addEventListener('input', () => { const p = spot(email); goal = above(p); strike(p); });
+
+  function paintPassword(fresh) {
+    const v = [...pass.value], mark = (node, i) => { if (fresh && i === v.length - 1) node.className = 'new'; return node; };
+    dots.replaceChildren(...v.map((_, i) => { const d = mark(document.createElement('i'), i); d.style.setProperty('--i', i); return d; }));
+    text.replaceChildren(...v.map((ch, i) => { const b = mark(document.createElement('b'), i); b.textContent = ch; b.style.setProperty('--i', i); return b; }));
+    caret.style.translate = (passField.classList.contains('show') ? text.offsetWidth : v.length * 14) + 'px 0';
+  }
+  pass.addEventListener('input', () => {
+    clearTimeout(burnT); passField.classList.remove('burn'); note.classList.remove('on'); paintPassword(true);
+    const p = spot(pass); goal = above(p); if (pass.value) strike(p);
+  });
+
+  eye.addEventListener('click', () => {
+    const on = passField.classList.toggle('show');
+    eye.setAttribute('aria-pressed', on);
+    eye.setAttribute('aria-label', on ? 'Hide password' : 'Show password');
+    paintPassword(false);
+    const r = eye.getBoundingClientRect(), p = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    goal = above(p); strike(p);
+  });
+
+  // a wrong password: the light sags and comes back, orange sparks drift down, the dots burn out and the ball climbs back
+  let burnT;
+  function shortCircuit() {
+    shortAt = performance.now(); inside = false;
+    if (!reduce) for (let i = 0; i < 14; i++)
+      sparks.push({ x, y, vx: (Math.random() - .5) * 4, vy: -(1 + 2.5 * Math.random()), age: 0, life: 1.2 + .6 * Math.random(), r: 1 + Math.random(), hot: 1 });
+    note.textContent = 'Wrong password'; note.classList.add('on');
+    pass.value = ''; passField.classList.add('burn');
+    clearTimeout(burnT); burnT = setTimeout(() => { passField.classList.remove('burn'); paintPassword(false); }, 600);
+    pass.focus(); goal = above(spot(pass));
+  }
+
+  async function signIn(login, password) {
+    // a real request goes here, for example:
+    // const res = await fetch('/api/login', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ login, password }),
+    // });
+    // return res.ok;
+    await wait(250);
+    return password === DEMO_PASSWORD;
+  }
+
+  let round = 0;                            // grows on every submit and reset, so a late answer can tell it's stale
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (send.classList.contains('done')) return;
+    const empty = !email.value ? email : !pass.value ? pass : null;
+    if (empty) { goal = above(spot(empty)); empty.focus(); return; }
+    goal = at(send);
+    const mine = ++round, answer = signIn(email.value, pass.value);
+    await wait(200); if (mine !== round) return;
+    inside = true;                                   // the ball goes into the button
+    const [ok] = await Promise.all([answer, wait(100)]);
+    if (mine !== round) return;
+    if (!ok) return shortCircuit();
+    send.style.setProperty('--hx', x - send.getBoundingClientRect().left + 'px');
+    send.classList.add('done');
+    night.classList.add('day');
+    charged = performance.now();
+    const b = send.getBoundingClientRect();
+    if (!reduce) for (let i = 0; i < 24; i++) {        // the charged button throws electric sparks that slow down and settle
+      const a = -Math.PI / 2 + (Math.random() - .5) * 2.6, v = 1.8 + 3.2 * Math.random();
+      sparks.push({ x: b.left + 20 + Math.random() * (b.width - 40), y: b.top + 6, vx: Math.cos(a) * v * 1.2, vy: Math.sin(a) * v, age: 0, life: 1.4 + Math.random(), r: .9 + 1.1 * Math.random(), hot: 0 });
+    }
+    await wait(750);
+    inside = false;
+    const r = send.getBoundingClientRect();
+    goal = { x: r.left + r.width * .66, y: r.top - 22 };
+  });
+
+  // optional demo: call play() to auto-type; stops on click or key
+  let demo = false;
+  const stopDemo = () => {
+    if (!demo) return;
+    demo = false;
+    mailField.classList.remove('lit');
+    reset();
+  };
+  addEventListener('pointerdown', stopDemo, true);
+  addEventListener('keydown', stopDemo, true);
+
+  function reset() {
+    round++; away = false;
+    clearTimeout(burnT); shortAt = -1e4; sparks.length = 0;
+    email.value = pass.value = '';
+    passField.classList.remove('show', 'burn'); eye.setAttribute('aria-pressed', false);
+    send.classList.add('still'); send.classList.remove('done');       // back to Sign in at once, no unfilling
+    requestAnimationFrame(() => requestAnimationFrame(() => send.classList.remove('still')));
+    night.classList.remove('day'); note.classList.remove('on');
+    paintPassword(false); inside = false; charged = null;
+  }
+  async function typeInto(input, word, gap) {
+    for (const ch of word) {
+      if (!demo) return false;
+      input.value += ch; input.dispatchEvent(new Event('input'));
+      await wait(gap);
+    }
+    return demo;
+  }
+
+  async function play() {
+    demo = true;
+    await wait(200); if (!demo) return;
+    mailField.classList.add('lit');
+    if (!await typeInto(email, 'you@example.com', 42)) return;
+    await wait(60); if (!demo) return;
+    mailField.classList.remove('lit'); pass.focus();
+    await wait(90); if (!demo) return;
+    if (!await typeInto(pass, 'zap', 72)) return;
+    form.requestSubmit();                             // a wrong one first: a short circuit
+    await wait(920); if (!demo) return;
+    if (!await typeInto(pass, DEMO_PASSWORD, 72)) return;
+    await wait(250); if (!demo) return;
+    eye.click();
+    await wait(300); if (!demo) return;
+    form.requestSubmit();
+    await wait(4000); if (!demo) return;
+    goal = { x: goal.x + 30, y: goal.y - 60 }; away = true;   // it lifts and fades out like ball lightning, the dark comes back
+    night.classList.remove('day');
+    await wait(1000); if (!demo) return;
+    reset();
+    goal = above(spot(email)); x = goal.x - 60; y = goal.y - 30; vx = vy = 0;   // and comes back over the email field
+    await wait(1400); if (demo) play();
+  }
+</script>
+</body>
+</html>
